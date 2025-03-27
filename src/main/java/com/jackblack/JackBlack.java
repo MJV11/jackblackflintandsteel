@@ -102,7 +102,7 @@ public class JackBlack {
 
                 ItemStack selectedItem = player.getInventory().getItem(currentSlot); // Get the item in that slot
                 String item = selectedItem.toString().substring(12);
-                player.displayClientMessage(Component.literal(item), false); // this is called bugfixing
+                //player.displayClientMessage(Component.literal(item), false); // this is called bugfixing
                 if (ALLOWED_ITEMS.contains(item)) {
                     ResourceLocation rl = ResourceLocation.tryParse("jackblack:" + item);
                     SoundEvent soundEvent = BuiltInRegistries.SOUND_EVENT.getValue(rl);
