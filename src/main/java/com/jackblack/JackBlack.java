@@ -8,6 +8,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -40,6 +41,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
+import java.awt.*;
 
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -91,12 +93,13 @@ public class JackBlack {
         // Note that this is necessary if and only if we want *this* class (JackBlack) to respond directly to events.
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this);
-        // TODO: THIS IS PROBABLY WHAT WE NEED TO FIRE EVENTS ON
+
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -141,22 +144,32 @@ public class JackBlack {
         private static int lastSlot = -1; // Stores the previous selected slot
 
         @SubscribeEvent
-        public static void onClientTick(LevelTickEvent event) {
+        public static void onClientTick(ClientTickEvent event) {
 
             Minecraft mc = Minecraft.getInstance();
             LocalPlayer player = mc.player;
 
+
             if (player == null) return; // Ensure player exists
+            player.displayClientMessage(Component.literal("check player"), false);
 
             int currentSlot = player.getInventory().getSelectedSlot(); // Get the selected hotbar slot
             if (currentSlot != lastSlot) { // If the slot changed, play sound
                 lastSlot = currentSlot;
+                System.out.println("item switched");
+                LOGGER.info("item switched");  // Use the logger instead of System.out.println()
+                player.displayClientMessage(Component.literal("item switched"), false);
+
                 ItemStack selectedItem = player.getInventory().getItem(currentSlot); // Get the item in that slot
 
                 if (selectedItem.is(Items.FLINT_AND_STEEL)) {
+                    System.out.println("item is flint and steel");
+
                     ResourceLocation rl = ResourceLocation.tryParse("jackblack:flint-and-steel");
                     SoundEvent soundEvent = BuiltInRegistries.SOUND_EVENT.getValue(rl);
                     if (soundEvent != null) return;
+                    System.out.println("sound played");
+
                     player.level().playLocalSound(
                             player.getX(), player.getY(), player.getZ(),
                             soundEvent, // Change this to your custom sound if needed
@@ -164,8 +177,11 @@ public class JackBlack {
                             1.0F, 1.0F, false
                     );
                 }
-
             }
+        }
+
+        public static void register(IEventBus bus) {
+            bus.addListener(HotbarSoundHandler::onClientTick);
         }
     }
 }
