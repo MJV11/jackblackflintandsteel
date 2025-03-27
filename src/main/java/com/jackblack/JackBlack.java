@@ -1,5 +1,6 @@
 package com.jackblack;
 
+import com.mojang.datafixers.TypeRewriteRule;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -28,6 +29,9 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(JackBlack.MODID)
 public class JackBlack {
@@ -40,6 +44,16 @@ public class JackBlack {
 
     public static final DeferredHolder<SoundEvent, SoundEvent> FLINT_AND_STEEL_SOUND =
             SOUND_EVENTS.register("flint_and_steel", SoundEvent::createVariableRangeEvent);
+    public static final DeferredHolder<SoundEvent, SoundEvent> BUCKET_SOUND =
+            SOUND_EVENTS.register("bucket", SoundEvent::createVariableRangeEvent);
+    public static final DeferredHolder<SoundEvent, SoundEvent> COOKED_CHICKEN_SOUND =
+            SOUND_EVENTS.register("cooked_chicken", SoundEvent::createVariableRangeEvent);
+    public static final DeferredHolder<SoundEvent, SoundEvent> ENDER_PEARL_SOUND =
+            SOUND_EVENTS.register("ender_pearl", SoundEvent::createVariableRangeEvent);
+    public static final DeferredHolder<SoundEvent, SoundEvent> CRAFTING_TABLE_SOUND =
+            SOUND_EVENTS.register("crafting_table", SoundEvent::createVariableRangeEvent);
+
+    private static ArrayList<String> ALLOWED_ITEMS = new ArrayList<String>();
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
@@ -56,6 +70,9 @@ public class JackBlack {
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
+        String[] queuedItems = {"flint_and_steel", "bucket", "crafting_table", "cooked_chicken", "ender_pearl"};
+        ALLOWED_ITEMS.addAll(Arrays.asList(queuedItems));
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -80,22 +97,19 @@ public class JackBlack {
             if (player == null) return; // Ensure player exists
 
             int currentSlot = player.getInventory().getSelectedSlot(); // Get the selected hotbar slot
-            if (currentSlot != lastSlot) { // If the slot changed, play sound
+            if (currentSlot != lastSlot) {
                 lastSlot = currentSlot;
 
                 ItemStack selectedItem = player.getInventory().getItem(currentSlot); // Get the item in that slot
-
-                if (selectedItem.is(Items.FLINT_AND_STEEL)) {
-                    player.displayClientMessage(Component.literal("item is flint and steel"), false);
-
-                    ResourceLocation rl = ResourceLocation.tryParse("jackblack:flint_and_steel");
+                String item = selectedItem.toString().substring(12);
+                player.displayClientMessage(Component.literal(item), false); // this is called bugfixing
+                if (ALLOWED_ITEMS.contains(item)) {
+                    ResourceLocation rl = ResourceLocation.tryParse("jackblack:" + item);
                     SoundEvent soundEvent = BuiltInRegistries.SOUND_EVENT.getValue(rl);
-
                     if (soundEvent == null) {
-                        player.displayClientMessage(Component.literal("sound not found"), false);
+                        player.displayClientMessage(Component.literal("sound not found: jackblack:" + item), false);
                         return;
                     }
-
                     try {
                         player.level().playLocalSound(
                                 player.getX(), player.getY(), player.getZ(),
@@ -106,8 +120,6 @@ public class JackBlack {
                     } catch (Exception e) {
                         player.displayClientMessage(Component.literal(e.toString()), false);
                     }
-
-
                 }
             }
         }

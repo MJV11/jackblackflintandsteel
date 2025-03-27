@@ -6,24 +6,31 @@
         "stream": false
       }
     ]
-  },"enderpearl": {
+  },"ender_pearl": {
     "sounds": [
       {
-        "name": "jackblack:enderpearl",
+        "name": "jackblack:ender_pearl",
         "stream": false
       }
     ]
-  },"elytra": {
+  },"cooked_chicken": {
     "sounds": [
       {
-        "name": "jackblack:elytra",
+        "name": "jackblack:cooked_chicken",
         "stream": false
       }
     ]
   },"bucket": {
+  "sounds": [
+    {
+      "name": "jackblack:bucket",
+      "stream": false
+    }
+  ]
+  },"crafting_table": {
     "sounds": [
       {
-        "name": "jackblack:bucket",
+        "name": "jackblack:crafting_table",
         "stream": false
       }
     ]
