@@ -1,0 +1,10 @@
+{
+  "your_sound": {
+    "sounds": [
+      {
+        "name": "jackblack:flint-and-steel",
+        "stream": false
+      }
+    ]
+  }
+}
