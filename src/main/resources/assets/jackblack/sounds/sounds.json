@@ -1,8 +1,8 @@
 {
-  "your_sound": {
+  "flint_and_steel": {
     "sounds": [
       {
-        "name": "jackblack:flint-and-steel",
+        "name": "jackblack:flint_and_steel",
         "stream": false
       }
     ]
