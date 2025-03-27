@@ -9,9 +9,7 @@ import net.minecraft.world.item.*;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.slf4j.Logger;
-
 import com.mojang.logging.LogUtils;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -84,7 +82,6 @@ public class JackBlack {
             int currentSlot = player.getInventory().getSelectedSlot(); // Get the selected hotbar slot
             if (currentSlot != lastSlot) { // If the slot changed, play sound
                 lastSlot = currentSlot;
-                player.displayClientMessage(Component.literal("item switched"), false);
 
                 ItemStack selectedItem = player.getInventory().getItem(currentSlot); // Get the item in that slot
 
@@ -97,8 +94,6 @@ public class JackBlack {
                     if (soundEvent == null) {
                         player.displayClientMessage(Component.literal("sound not found"), false);
                         return;
-                    } else {
-                        player.displayClientMessage(Component.literal("sound found"), false);
                     }
 
                     try {
@@ -108,7 +103,6 @@ public class JackBlack {
                                 SoundSource.PLAYERS,
                                 1.0F, 1.0F, false
                         );
-                        player.displayClientMessage(Component.literal("sound played"), false);
                     } catch (Exception e) {
                         player.displayClientMessage(Component.literal(e.toString()), false);
                     }

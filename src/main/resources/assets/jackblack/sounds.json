@@ -1,0 +1,31 @@
+{
+  "flint_and_steel": {
+    "sounds": [
+      {
+        "name": "jackblack:flint_and_steel",
+        "stream": false
+      }
+    ]
+  },"enderpearl": {
+    "sounds": [
+      {
+        "name": "jackblack:enderpearl",
+        "stream": false
+      }
+    ]
+  },"elytra": {
+    "sounds": [
+      {
+        "name": "jackblack:elytra",
+        "stream": false
+      }
+    ]
+  },"bucket": {
+    "sounds": [
+      {
+        "name": "jackblack:bucket",
+        "stream": false
+      }
+    ]
+  }
+}
