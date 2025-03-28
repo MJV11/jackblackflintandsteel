@@ -28,9 +28,23 @@
     }
   ]
   },"crafting_table": {
+  "sounds": [
+    {
+      "name": "jackblack:crafting_table",
+      "stream": false
+    }
+  ]
+  },"overworld": {
     "sounds": [
       {
-        "name": "jackblack:crafting_table",
+        "name": "jackblack:overworld",
+        "stream": false
+      }
+    ]
+  },"the_nether": {
+    "sounds": [
+      {
+        "name": "jackblack:the_nether",
         "stream": false
       }
     ]

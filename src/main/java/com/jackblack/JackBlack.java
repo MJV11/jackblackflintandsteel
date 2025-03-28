@@ -1,11 +1,10 @@
 package com.jackblack;
 
-import com.mojang.datafixers.TypeRewriteRule;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
@@ -28,6 +27,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +42,7 @@ public class JackBlack {
 
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(Registries.SOUND_EVENT, MODID);
 
+    // custom item announcement sounds
     public static final DeferredHolder<SoundEvent, SoundEvent> FLINT_AND_STEEL_SOUND =
             SOUND_EVENTS.register("flint_and_steel", SoundEvent::createVariableRangeEvent);
     public static final DeferredHolder<SoundEvent, SoundEvent> BUCKET_SOUND =
@@ -54,6 +55,12 @@ public class JackBlack {
             SOUND_EVENTS.register("crafting_table", SoundEvent::createVariableRangeEvent);
 
     private static ArrayList<String> ALLOWED_ITEMS = new ArrayList<String>();
+
+    // custom dimension sounds
+    public static final DeferredHolder<SoundEvent, SoundEvent> OVERWORLD_SOUND =
+            SOUND_EVENTS.register("overworld", SoundEvent::createVariableRangeEvent);
+    public static final DeferredHolder<SoundEvent, SoundEvent> THE_NETHER_SOUND =
+            SOUND_EVENTS.register("the_nether", SoundEvent::createVariableRangeEvent);
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
@@ -120,6 +127,80 @@ public class JackBlack {
                     } catch (Exception e) {
                         player.displayClientMessage(Component.literal(e.toString()), false);
                     }
+                }
+            }
+        }
+    }
+
+    // TODO: THIS DOES NOT WORK AT THE MOMENT. I DO NOT KNOW WHY.
+    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+    public static class DimensionChangeHandler {
+        @SubscribeEvent
+        public static void onPlayerChangedDimension(PlayerChangedDimensionEvent event) {
+            Player player = event.getEntity();
+
+            Minecraft mc = Minecraft.getInstance();
+            LocalPlayer localplayer = mc.player;
+
+            if (!localplayer.getName().getString().equals(player.getName().getString())) return;
+
+            String place = event.getTo().location().toString();
+            place = place.substring(place.indexOf(":") + 1);
+            if (place.equals("overworld") || place.equals("the_nether")) {
+                ResourceLocation rl = ResourceLocation.tryParse("jackblack:" + place);
+                SoundEvent soundEvent = BuiltInRegistries.SOUND_EVENT.getValue(rl);
+                if (soundEvent == null) {
+                    localplayer.displayClientMessage(Component.literal("Sound not found: jackblack:" + place), false);
+                    return;
+                }
+
+                try {
+                    localplayer.level().playLocalSound(
+                            player.getX(), player.getY(), player.getZ(),
+                            soundEvent,
+                            SoundSource.PLAYERS,
+                            1.0F, 1.0F, false
+                    );
+                } catch (Exception e) {
+                    player.displayClientMessage(Component.literal("Error: " + e.getMessage()), false);
+                }
+            }
+        }
+    }
+
+    // TODO: FIX THE ONE ABOVE SO THAT WE CAN DELETE THE ONE THAT RUNS EVERY TICK
+    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+    public static class DimensionChangeHandlerBurdensome {
+        public static String lastDimension = "";
+        @SubscribeEvent
+        public static void onPlayerChangedDimensionBurdensome(ClientTickEvent.Pre event) {
+            Minecraft mc = Minecraft.getInstance();
+            LocalPlayer player = mc.player;
+
+            if (player == null) return;
+
+            String place = player.level().dimension().toString();
+            place = place.substring(place.indexOf("/ minecraft:") + 12, place.indexOf("]"));
+
+            if (place.equals(lastDimension)) return;
+            else lastDimension = place;
+            if (place.equals("overworld") || place.equals("the_nether")) {
+                ResourceLocation rl = ResourceLocation.tryParse("jackblack:" + place);
+                SoundEvent soundEvent = BuiltInRegistries.SOUND_EVENT.getValue(rl);
+                if (soundEvent == null) {
+                    player.displayClientMessage(Component.literal("Sound not found: jackblack:" + place), false);
+                    return;
+                }
+
+                try {
+                    player.level().playLocalSound(
+                            player.getX(), player.getY(), player.getZ(),
+                            soundEvent,
+                            SoundSource.PLAYERS,
+                            1.0F, 1.0F, false
+                    );
+                } catch (Exception e) {
+                    player.displayClientMessage(Component.literal("Error: " + e.getMessage()), false);
                 }
             }
         }
