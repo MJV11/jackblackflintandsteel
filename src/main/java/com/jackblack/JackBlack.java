@@ -132,7 +132,8 @@ public class JackBlack {
         }
     }
 
-    // TODO: THIS DOES NOT WORK AT THE MOMENT. I DO NOT KNOW WHY.
+    // TODO: THIS DOES NOT WORK AT THE MOMENT. I DO NOT KNOW WHY. THE PLAY SOUND LINE FIRES BUT IS SILENT
+    // theory is that the nether portal sound overrides all other sounds played before the portal sound.
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
     public static class DimensionChangeHandler {
         @SubscribeEvent
