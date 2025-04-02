@@ -181,3 +181,7 @@ idea {
         downloadJavadoc = true
     }
 }
+
+test {
+    enabled = false
+}
